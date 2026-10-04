@@ -17,3 +17,30 @@ if ('IntersectionObserver' in window) {
   }, { rootMargin: '-25% 0px -65% 0px' });
   sections.forEach((section) => observer.observe(section));
 }
+
+const averageReach = document.querySelector('#average-reach');
+const localRatio = document.querySelector('#local-ratio');
+const reachResult = document.querySelector('#reach-result');
+const updateReach = () => {
+  const reach = Number(averageReach.value);
+  const ratio = Number(localRatio.value);
+  if (!averageReach.value || !localRatio.value || !Number.isFinite(reach) || !Number.isFinite(ratio) || reach < 0 || ratio < 0 || ratio > 100) {
+    reachResult.textContent = '実績を入力すると参考値を表示します';
+    return;
+  }
+  const estimate = Math.round(reach * ratio / 100);
+  reachResult.textContent = `地域内想定到達：約${new Intl.NumberFormat('ja-JP').format(estimate)}人（参考値）`;
+};
+averageReach.addEventListener('input', updateReach);
+localRatio.addEventListener('input', updateReach);
+
+const reviewCopyButton = document.querySelector('#copy-review');
+reviewCopyButton.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(document.querySelector('#review-copy').textContent.trim());
+    reviewCopyButton.textContent = 'コピーしました';
+    setTimeout(() => { reviewCopyButton.textContent = '文面をコピー'; }, 2500);
+  } catch {
+    reviewCopyButton.textContent = '文面を選択してコピーしてください';
+  }
+});
